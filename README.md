@@ -1,72 +1,71 @@
-# Garimpo Indie: Engenharia de Dados e Analise do Monopólio Cultural Musical
+# Garimpo Indie: Investigação e Análise dos Fluxos de Distribuição na Indústria Fonográfica Digital
 
-O Garimpo Indie é um projeto de Back-End, Engenharia e Análise de Dados desenvolvido para investigar o consumo musical nas capitais brasileiras, contrapondo o ecossistema cultural regional ao algoritmo de massa do eixo tradicional Rio de Janeiro - Sao Paulo (RJ-SP).
+Este projeto de engenharia de dados e desenvolvimento back-end foi desenvolvido por mim para investigar os padrões de consumo e distribuição musical nas capitais brasileiras. O objetivo central foi analisar de forma crítica como os ecossistemas culturais regionais interagem e se posicionam diante das dinâmicas mercadológicas impostas pelo Spotify, que atua hoje como a principal plataforma curadora e ditadora de tendências na indústria da música.
 
-A aplicação processa um histórico massivo de mais de 201.000 linhas de rankings semanais do Spotify (compreendendo os anos de 2021 a 2024), extrai insights socioculturais, além de estruturar um banco de dados relacional robusto e expõe os resultados através de uma API estável construida com FastAPI.
-
----
-
-## Roteiro do Projeto e Arquitetura Tecnologica
-
-O projeto foi executado seguindo tres etapas de maturidade de engenharia de software:
-
-1. **Analise de Dados e ETL (1_analise_e_consolidacao.ipynb):** Varredura automatizada de centenas de arquivos semanais isolados em pastas regionais, tratamento de codificação de texto e cruzamento massivo de tabelas.
-2. **Modelagem Relacional (modelos.py e popular_banco.py):** Arquitetura SQL estruturada via ORM (SQLAlchemy), normalizando dados brutos em relacionamentos de chaves primarias e estrangeiras para garantir performance de leitura.
-3. **Exposição de Dados via API (api.py):** Construção de endpoints escalaveis usando FastAPI e Uvicorn para servir as analises diretamente do banco indexado.
+No desenvolvimento desta pesquisa, processei um histórico de mais de 201.000 linhas de rankings semanais da plataforma (compreendendo os anos de 2021 a 2024). Eu extraí insights sobre o comportamento dos mercados locais, estruturei um banco de dados relacional e expus os resultados através de uma API construída com FastAPI.
 
 ---
 
-## Linha do Tempo da Analise, Hipóteses e Tomadas de Decisão
+## Estrutura Metodológica e Arquitetura do Projeto
 
-O desenvolvimento do projeto foi marcado por uma investigação minuciosa dos dados brutos, onde cada barreira tecnica ou comportamento inesperado gerou uma nova solucao de engenharia:
+Organizei o desenvolvimento deste projeto em três etapas principais:
 
-### 1. Primeira Hipótese: A Resiliência do Underground
-Busquei identificar quais as músicas que demonstraram uma força extrema de permanência (alto streak), mas que nunca atingiram o topo absoluto (#1) controlado pelas grandes engrenagens de marketing pop. 
-* **Resultado:** Encontrei o projeto independente "Poesia Acustica #6", que sustentou uma resiliência de 118 semanas seguidas dentro dos rankings regionais sem nunca alcancar o primeiro lugar. Isso provou a tese de que movimentos de nicho constroem ecossistemas autonomos e fieis de ouvintes.
-
-### 2. Segunda Hipótese: A Busca pela Autonomia no Top 10 e o Filtro de Ruido Comercial
-A intenção era isolar mísicas que alcancaram o Top 10 em capitais com forte identidade cultural regional, mas que passaram longe do eixo tradicional (pior que a posicao #85 ou inexistentes) no Sudeste.
-
-* **O Desafio do Sertanejo:** Ao abrir a analise para multiplas cidades do interior e centro-oeste, o mega-mainstream do Sertanejo Universitario inundou os resultados. Ele distorceu a busca, pois esses hits comerciais dominavam os rankings com comportamentos puramente corporativos e de radio.
-* **O Refinamento de Escopo:** Para limpar o ruido comercial e isolar o garimpo de nicho, o escopo foi reduzido estritamente para as capitais Recife e Belo Horizonte.
-
-### 3. Terceira Hipótese: O impacto do algoritmo em Manaus e o resultado que me surpreendeu
-Tentamos aplicar o mesmo filtro estrito (Top 10 local vs abaixo de #60 ou ausente no Sudeste) alterando as variaveis para estudar a capital Manaus e Belo Horizonte.
-* **O Resultado Vazio:** Para a nossa surpresa, a consulta retornou uma tabela completamente vazia. 
-* **O Insight Critico:** Esse resultado "vazio" foi, na verdade, uma das maiores revelacoes do projeto. Ele provou empiricamente o peso esmagador do monopolio cultural e da padronizacao do algoritmo do Spotify. Os dados mostraram que o mercado de massa nacional e tao centralizado que e matematicamente impossivel uma musica alcancar o topo maximo (Top 10) de capitais como Manaus ou Belo Horizonte sem ser arrastada e injetada nas paradas de Sao Paulo e Rio de Janeiro de forma simultanea.
-
-### 4. Quarta Hipótese: A Validação do Sucesso Autônomo em Recife
-Ajustando o filtro para um cenario de equilibrio e focando a busca especificamente na capital de Recife, a analise finalmente isolou o comportamento de resistencia cultural que procuravamos. Conseguimos extrair os seguintes dados:
-* **"Cadê Seu Namorado Moça?" (Thales Lessa) e "Duas" (Nadson O Ferinha):** Bateram o Top 10 regional em Recife (posicoes #9 e #10), enquanto no eixo RJ-SP figuravam na posicao 101 (completamente inexistentes nas paradas).
-* **"A Gente Se Entrega" (NATTAN):** Alcancou a posicao #7 em Recife e permaneceu em 101 no eixo central.
-* **"Coisas Que Eu Sei" (Felipe Amorim):** Bateu o pico de #4 em Recife, figurando escondido na posicao #89 no Sudeste.
-
-Estes dados validaram a existencia de um ecossistema musical regional autossuficiente e bilionario no Nordeste, que se movimenta e consome em alta escala de forma independente do aval ou timing das mídias centrais do Sudeste.
-
-### 5. Solução do Bug Tecnico de Encoding (Belm)
-Durante a unificacao das mais de 200 mil linhas, a codificacao de texto antiga gerada pelo sistema operacional corrompeu o caractere especial da cidade de Belem, transformando a string em um formato corrompido em memoria. No script de populacao final (popular_banco.py), criamos um algoritmo de tratamento de string que interceptou o padrao quebrado e forcou a gravacao limpa da palavra "Belém" antes de realizar o insert no banco de dados.
+1. **Tratamento de Dados e ETL (1_analise_e_consolidacao.ipynb):** Executei a varredura automatizada de centenas de relatórios semanais isolados em pastas regionais, padronizei a codificação de caracteres das strings e unifiquei as tabelas.
+2. **Modelagem Relacional (modelos.py e popular_banco.py):** Desenhei uma arquitetura SQL via ORM (SQLAlchemy), dividindo os dados brutos em tabelas normalizadas com chaves primárias e estrangeiras para otimizar a performance de leitura.
+3. **Disponibilização através de API (api.py):** Construí endpoints usando FastAPI e Uvicorn para permitir a consulta dinâmica das análises diretamente no banco de dados indexado.
 
 ---
 
-## Dicionario de Dados do Banco Relacional
+## Trajetória de Análise, Hipóteses e Tomadas de Decisão
 
-Para normalizar a base bruta de planilhas CSV e garantir consultas de historico em milissegundos, estruturamos o seguinte modelo de tabelas SQL:
+A investigação foi pautada pelo teste de hipóteses sobre a centralização do mercado da música e a capacidade de sobrevivência de manifestações culturais periféricas ou regionais nas paradas de sucesso:
+
+### 1. Primeira Hipótese: A Resiliência de Fluxos Alternativos ao Topo Comercial
+Busquei identificar faixas que demonstraram uma força contínua de permanência nos rankings regionais (alto streak), mesmo sem atingirem a posição número #1 nacional — o ponto máximo de visibilidade moldado pelas estratégias de grande alcance da indústria.
+* **Resultado:** Isolei o projeto independente "Poesia Acústica #6", que sustentou uma resiliência de 118 semanas seguidas dentro das paradas de consumo regional sem nunca figurar no topo absoluto. Isto validou a minha hipótese de que circuitos alternativos conseguem fidelizar e manter comunidades de ouvintes estáveis à margem dos investimentos massivos das grandes editoras.
+
+### 2. Segunda Hipótese: A Autonomia dos Mercados Regionais e a Filtragem de Ruído Comercial
+A minha intenção original era mapear as músicas que alcançaram o Top 10 em capitais com forte identidade local, mas que foram ignoradas ou estiveram ausentes das paradas (abaixo da posição #85 ou inexistentes) no eixo tradicional de consumo do Sudeste.
+* **O Desafio do Sertanejo:** Ao expandir inicialmente a análise para múltiplas cidades, percebi que a massificação comercial do Sertanejo Universitário inundou os resultados. Este fenómeno não representava um mercado de nicho local, mas sim a reprodução de um modelo corporativo de grande escala que replica as dinâmicas da rádio comercial na plataforma.
+* **O Refinamento de Escopo:** Para isolar dinâmicas de consumo genuinamente regionalizadas, reduzi o escopo da pesquisa estritamente às capitais Recife e Belo Horizonte.
+
+### 3. Terceira Hipótese: A Centralização no Mercado de Massa de Manaus
+Tentei replicar o mesmo critério estrito de filtragem (Top 10 local vs exclusão no Sudeste) alterando as variáveis de espaço para estudar as capitais Manaus e Belo Horizonte.
+* **O Resultado Vazio:** A consulta no banco de dados retornou uma tabela completamente vazia.
+* **O Insight Técnico:** Longe de ser um erro de código, este resultado revelou-me um dado profundo sobre a economia de plataformas. Ele demonstrou empiricamente o nível de centralização imposto pelo algoritmo do Spotify no topo da pirâmide do consumo. Os dados provaram que a indústria está tão unificada que é matematicamente inviável uma música atingir o ápice (Top 10) de mercados como Manaus ou Belo Horizonte sem que as forças de distribuição e as playlists editoriais da plataforma a injetem, simultaneamente, nas paradas de São Paulo e do Rio de Janeiro.
+
+### 4. Quarta Hipótese: A Validação da Autossuficiência no Mercado do Nordeste
+Ao focar a análise de equilíbrio especificamente na capital de Recife, consegui isolar o comportamento de independência que buscava mapear desde o início. Extraí as seguintes evidências:
+* **"Cadê Seu Namorado Moça?" (Thales Lessa) e "Duas" (Nadson O Ferinha):** Conquistaram o Top 10 regional em Recife (posições #9 e #10), enquanto no eixo RJ-SP permaneceram na posição 101 (completamente fora das paradas de sucesso).
+* **"A Gente Se Entrega" (NATTAN):** Atingiu a posição #7 em Recife e figurou como inexistente (101) no mercado do Sudeste.
+* **"Coisas Que Eu Sei" (Felipe Amorim):** Alcançou a posição #4 em Recife, surgindo de forma tardia ou periférica em #89 no Sudeste.
+
+Estes dados confirmaram a existência de um mercado fonográfico regional altamente autossuficiente no Nordeste. Ele movimenta capital financeiro e simbólico em alta escala, operando com um timing e uma lógica de consumo independentes das mídias centrais do Sudeste.
+
+### 5. Tratamento de Anomalias de Dados (Encoding de Belém)
+No processo de unificação das tabelas, identifiquei um erro de codificação de texto (*encoding*) originado na geração dos relatórios, que corrompeu os caracteres da palavra Belém, registando-a como `Belm` em memória. No meu script de automação (`popular_banco.py`), tratei esta anomalia intercetando a string corrompida e padronizando-a para "Belém" antes da persistência no banco de dados SQL.
+
+---
+
+## Dicionário de Dados do Banco Relacional
+
+Para organizar o histórico massivo e garantir consultas em milissegundos, estruturei o banco de dados sob o seguinte esquema:
 
 ### Tabela: musicas
-*   uri (PK - String): Codigo unico identificador do Spotify (utilizado como o RG unico da faixa).
-*   track_name (String): Nome oficial da musica.
+*   uri (PK - String): Identificador único do Spotify (utilizado como o RG da faixa).
+*   track_name (String): Título oficial da música.
 *   artist_names (String): Nome dos artistas ou bandas envolvidas.
 
 ### Tabela: cidades
-*   id_cidade (PK - Integer - Autoincrement): Identificador numerico gerado automaticamente.
-*   nome_cidade (String - Unique): Nome da capital brasileira mapeada.
+*   id_cidade (PK - Integer - Autoincrement): Identificador numérico gerado automaticamente.
+*   nome_cidade (String - Unique): Nome da capital brasileira estudada.
 
 ### Tabela: historico_rankings
-*   id_ranking (PK - Integer - Autoincrement): Identificador do registro de historico.
-*   rank (Integer): Posicao da musica no Top 100 daquela semana especifica (1 a 100).
-*   semana (String): Periodo temporal correspondente ao ranking.
-*   peak (Integer): Melhor posicao historica que a musica atingiu ate aquela data.
-*   streak (Integer): Quantidade de semanas seguidas que a musica se manteve no Top 100.
+*   id_ranking (PK - Integer - Autoincrement): Identificador do registo de histórico.
+*   rank (Integer): Posição da música no Top 100 daquela semana específica (1 a 100).
+*   semana (String): Período temporal correspondente ao ranking.
+*   peak (Integer): Melhor posição histórica que a música atingiu até aquela data.
+*   streak (Integer): Quantidade de semanas consecutivas que a música se manteve no Top 100.
 *   fk_musica (FK - String): Aponta para o campo uri da tabela musicas.
 *   fk_cidade (FK - Integer): Aponta para o campo id_cidade da tabela cidades.
 
@@ -74,14 +73,14 @@ Para normalizar a base bruta de planilhas CSV e garantir consultas de historico 
 
 ## Como Executar o Projeto Localmente
 
-1. Configurar o ambiente virtual (.venv) e instalar as dependencias:
+1. Configurar o ambiente virtual (.venv) e instalar as dependências:
 ```bash
 python -m venv .venv
 .\.venv\Scripts\activate
 python -m pip install pandas notebook openpyxl sqlalchemy fastapi uvicorn
 ```
 
-2. Executar o mapeamento das tabelas e o processo de migracao de dados (ETL):
+2. Executar o mapeamento das tabelas e o processo de migração de dados (ETL):
 ```bash
 python modelos.py
 python popular_banco.py
@@ -91,4 +90,22 @@ python popular_banco.py
 ```bash
 uvicorn api:app --reload
 ```
-Acesse a documentacao interativa gerada automaticamente pelo FastAPI no seu navegador atraves do endereço: http://localhost:8000/docs.
+*Nota técnica: O endereço `http://localhost:8000/docs` indicado na inicialização do servidor serve para aceder à documentação interativa das rotas na máquina local onde o projeto for executado.*
+
+---
+
+## Origem da Base de Dados
+
+Os dados brutos utilizados nesta investigação foram extraídos de repositórios públicos na plataforma **Kaggle**, contendo relatórios consolidados de audiência regional do Spotify. A base compreende o agregador de rankings semanais por capitais do mercado brasileiro, cobrindo o período de 2021 a 2024, totalizando mais de 201.000 registos de posições de faixas musicais.
+
+---
+
+## Técnicas de Engenharia e Métodos Analíticos Utilizados
+
+Para transformar o volume bruto de ficheiros CSV no sistema estruturado do Garimpo Indie, apliquei as seguintes técnicas com a biblioteca Pandas no Jupyter Notebook:
+
+*   **Automação de Diretórios com o Módulo OS:** Desenvolvi lógicas de varredura para mapear e ler recursivamente centenas de tabelas semanais distribuídas em subpastas de capitais, eliminando a necessidade de caminhos manuais (*hardcoded*).
+*   **Agregação e Consolidação Massiva:** Utilizei a função `pd.concat` para unificar os milhares de fragmentos semanais numa única matriz de dados global em memória, gerando colunas indexadoras para cronologia (`semana`) e espaço (`cidade`).
+*   **Mapeamento de Extremos via Agrupamento (Groupby e Agg):** Apliquei o método `groupby` combinado com funções de agregação (`.agg`) como `.min()` e `.max()` para isolar o histórico longitudinal de cada faixa musical. Isto permitiu extrair de forma exata o melhor pico histórico de cada obra e a sua resiliência consecutiva (*streak*) dentro de cada mercado específico.
+*   **Junções Relacionais (Merge):** Utilizei o conceito de `pd.merge` com comportamento de `LEFT JOIN` para cruzar o comportamento das faixas nas capitais de nicho contra a tabela de comportamento no eixo tradicional RJ-SP. Esta operação isolou matematicamente os fenómenos de sucesso estritamente regional, fundamentais para a validação das hipóteses de autonomia cultural.
+
