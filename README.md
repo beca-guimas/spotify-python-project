@@ -17,7 +17,7 @@ Construída com Python, SQLAlchemy e FastAPI, e usada para investigar se mercado
 O projeto tem duas partes que se alimentam:
 
 - **Backend:** pipeline de ETL, modelagem relacional e API REST para consultar os rankings.
-- **Análise:** perguntas de pesquisa respondidas em cima desse banco, e algumas delas viraram endpoints.
+- **Análise dos dados:** perguntas de pesquisa respondidas em cima desse banco, e algumas delas viraram endpoints.
 
 ```
 CSVs semanais (Kaggle)
@@ -130,6 +130,6 @@ A análise foi feita com Pandas no notebook e reproduzida nas consultas ao banco
 - [ ] Dockerizar e publicar a API online
 - [ ] Testar a sensibilidade da análise variando o corte de posição
 
-## Contato
+# Autor
 
-**Beca Guimas** · [LinkedIn](COLOQUE_O_LINK_DO_SEU_LINKEDIN)
+**Beca Guimas** · [LinkedIn](https://www.linkedin.com/in/becaguimas/)
