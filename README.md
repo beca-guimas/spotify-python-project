@@ -1,84 +1,46 @@
-# 🎧 Garimpo Indie
+# 🎧 Garimpo Indie API
 
-**Existe mercado musical regional no Spotify, ou tudo converge para o eixo RJ-SP?**
-Análise de 201 mil linhas de rankings semanais (Brasil, 2021–2024) com ETL em Pandas, banco relacional com SQLAlchemy e API em FastAPI.
+**API REST com banco relacional sobre 201 mil rankings semanais do Spotify Brasil (2021–2024).**
+Construída com Python, SQLAlchemy e FastAPI, e usada para investigar se mercados musicais regionais (Recife, BH) funcionam de forma independente do eixo RJ-SP.
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
-![Pandas](https://img.shields.io/badge/Pandas-ETL-150458)
-![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-red)
 ![FastAPI](https://img.shields.io/badge/FastAPI-API-009688)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-red)
+![Pandas](https://img.shields.io/badge/Pandas-ETL-150458)
 
-<!-- Dica: coloque aqui um print da documentação interativa (/docs) ou um gráfico do notebook -->
-
----
-
-## O que este projeto faz
-
-1. **ETL:** lê centenas de relatórios semanais (CSV) organizados em pastas por capital, corrige problemas de encoding e consolida tudo em uma única base.
-2. **Banco de dados:** modela os dados em 3 tabelas normalizadas (SQLAlchemy) com chaves primárias e estrangeiras.
-3. **API:** expõe consultas sobre o banco via FastAPI, com documentação interativa automática.
-4. **Análise:** usa a base para testar hipóteses sobre centralização e autonomia de mercados regionais.
-
-## Pergunta de pesquisa
-
-> Músicas que estouram em capitais com forte identidade local também aparecem nas paradas do eixo RJ-SP, ou esses mercados funcionam de forma independente?
-
-Para responder, cruzei o desempenho de cada faixa em cada capital com a posição dela no ranking do RJ-SP (valor **101** = fora do Top 100).
+<!-- Coloque aqui um print do Swagger (http://localhost:8000/docs) -->
 
 ---
 
-## Principais achados
+## Visão geral
 
-### 1. Recife tem hits que o Sudeste não enxerga
+O projeto tem duas partes que se alimentam:
 
-| Música | Artista | Melhor posição em Recife | Posição no RJ-SP |
-|---|---|---|---|
-| Coisas Que Eu Sei | Felipe Amorim | #4 | #89 |
-| A Gente Se Entrega | NATTAN | #7 | fora do Top 100 |
-| Cadê Seu Namorado Moça? | Thales Lessa | #9 | fora do Top 100 |
-| Duas | Nadson O Ferinha | #10 | fora do Top 100 |
-
-Isso indica que o mercado do Nordeste pode operar com lógica e timing próprios, independentes do Sudeste.
-
-### 2. Permanência sem depender do #1
-
-"Poesia Acústica #6" ficou **118 semanas consecutivas** nos rankings regionais sem chegar ao #1 nacional. Sinal de que circuitos alternativos conseguem manter uma base fiel de ouvintes.
-
-### 3. Manaus × Belo Horizonte: a consulta que voltou vazia
-
-Ao aplicar o mesmo filtro (Top 10 local e ausente do RJ-SP), não apareceu nenhuma faixa. Em vez de tratar como erro, interpretei como indício de **forte centralização**: nessas capitais, quem chega ao topo tende a chegar também a SP e RJ.
-
-### 4. Decisão de escopo: por que só Recife e BH
-
-Na primeira rodada, com várias cidades, o sertanejo universitário dominou os resultados. Ele segue um modelo de distribuição em larga escala, não um fenômeno local. Para isolar dinâmicas realmente regionais, restringi a análise a Recife e Belo Horizonte.
-
----
-
-## Limitações
-
-- O ranking mostra **posição**, não número de streams. Não dá para medir volume real de consumo.
-- O corte de "ausente do Sudeste" (posição > 85) é uma escolha minha, e os resultados podem mudar com outros limites.
-- RJ-SP é usado como proxy do Sudeste.
-- A relação com playlists editoriais e estratégia de gravadoras é uma **hipótese**; os dados não medem isso diretamente.
-
----
-
-## Arquitetura
+- **Backend:** pipeline de ETL, modelagem relacional e API REST para consultar os rankings.
+- **Análise:** perguntas de pesquisa respondidas em cima desse banco, e algumas delas viraram endpoints.
 
 ```
 CSVs semanais (Kaggle)
         │
         ▼
-1_analise_e_consolidacao.ipynb   →  limpeza, pd.concat, groupby/agg, merge
+1_analise_e_consolidacao.ipynb   →  leitura, limpeza e consolidação (Pandas)
         │
         ▼
-modelos.py + popular_banco.py    →  schema SQLAlchemy e carga no banco
+modelos.py + popular_banco.py    →  schema SQLAlchemy + carga no banco
         │
         ▼
-api.py (FastAPI + Uvicorn)       →  consultas via HTTP
+api.py (FastAPI + Uvicorn)       →  API REST com docs automática (Swagger)
 ```
 
-### Modelo de dados
+## Stack
+
+Python · FastAPI · Uvicorn · SQLAlchemy (ORM) · Pandas · Jupyter · PyCharm
+
+---
+
+## Banco de dados
+
+Normalizei os dados em 3 tabelas, com chaves primárias e estrangeiras:
 
 | Tabela | Colunas |
 |---|---|
@@ -86,13 +48,32 @@ api.py (FastAPI + Uvicorn)       →  consultas via HTTP
 | `cidades` | `id_cidade` (PK), `nome_cidade` (único) |
 | `historico_rankings` | `id_ranking` (PK), `rank`, `semana`, `peak`, `streak`, `fk_musica` → `musicas.uri`, `fk_cidade` → `cidades.id_cidade` |
 
-### Técnicas usadas
+**Pipeline de carga (`popular_banco.py`):**
+- Lê centenas de relatórios semanais organizados em subpastas por capital, sem caminhos fixos no código.
+- Corrige um problema de encoding nos arquivos de origem (`Belém` chegava como `Belm`) antes de gravar.
+- Popula as tabelas respeitando as relações entre elas.
 
-- **`os`**: varredura recursiva das pastas, sem caminhos fixos no código.
-- **`pd.concat`**: unificação dos arquivos semanais, com colunas de `semana` e `cidade`.
-- **`groupby` + `agg`**: pico histórico (`min`) e maior sequência (`max`) por faixa e cidade.
-- **`pd.merge` (left join)**: cruzamento entre capitais regionais e RJ-SP.
-- **Tratamento de encoding**: os relatórios traziam "Belém" corrompido como `Belm`; a string é corrigida em `popular_banco.py` antes de ir pro banco.
+## API
+
+Com o servidor rodando, a documentação interativa fica em **http://localhost:8000/docs**.
+
+
+
+| Método | Rota | O que retorna |
+|---|---|---|
+| GET | `/cidades` | Capitais disponíveis |
+| GET | `/musicas?busca=&limit=&offset=` | Busca paginada por título ou artista |
+| GET | `/musicas/{uri}` | Dados de uma faixa |
+| GET | `/musicas/{uri}/historico?cidade=` | Trajetória semanal da faixa |
+| GET | `/rankings?cidade=&semana=&top=` | Ranking de uma cidade em uma semana |
+| GET | `/analises/resiliencia?cidade=` | Faixas com maior sequência de semanas no ranking |
+| GET | `/analises/exclusivas-regionais?cidade=&top=&corte=` | Faixas Top N na cidade e ausentes do RJ-SP |
+
+Exemplo:
+
+```bash
+curl "http://localhost:8000/analises/exclusivas-regionais?cidade=Recife&top=10&corte=85"
+```
 
 ---
 
@@ -101,48 +82,54 @@ api.py (FastAPI + Uvicorn)       →  consultas via HTTP
 **Pré-requisito:** Python 3.10+
 
 ```bash
-# 1. Clonar e entrar na pasta
 git clone https://github.com/beca-guimas/spotify-python-project.git
 cd spotify-python-project
 
-# 2. Ambiente virtual
 python -m venv .venv
 source .venv/bin/activate        # Windows: .\.venv\Scripts\activate
 
-# 3. Dependências
 pip install pandas notebook openpyxl sqlalchemy fastapi uvicorn
 
-# 4. Criar tabelas e carregar os dados
-python modelos.py
-python popular_banco.py
-
-# 5. Subir a API
-uvicorn api:app --reload
+python modelos.py                # cria as tabelas
+python popular_banco.py          # carrega os dados
+uvicorn api:app --reload         # sobe a API
 ```
 
-Depois abra **http://localhost:8000/docs** para testar os endpoints.
+---
 
-### Endpoints
+## O que a análise mostrou
 
-<!-- Preencha com as rotas reais do api.py, por exemplo: -->
+A análise foi feita com Pandas no notebook e reproduzida nas consultas ao banco. O critério foi: Top 10 na capital regional e posição acima de #85 (ou ausência) no RJ-SP.
 
-| Método | Rota | Descrição |
-|---|---|---|
-| GET | `/exemplo` | _descreva aqui_ |
+**Recife tem hits que o Sudeste não enxerga:**
+
+| Música | Artista | Melhor posição em Recife | Posição no RJ-SP |
+|---|---|---|---|
+| Coisas Que Eu Sei | Felipe Amorim | #4 | #89 |
+| A Gente Se Entrega | NATTAN | #7 | fora do Top 100 |
+| Cadê Seu Namorado Moça? | Thales Lessa | #9 | fora do Top 100 |
+| Duas | Nadson O Ferinha | #10 | fora do Top 100 |
+
+**Outros achados:**
+- "Poesia Acústica #6" ficou **118 semanas consecutivas** nos rankings regionais sem chegar ao #1 nacional.
+- Em Manaus e Belo Horizonte, o mesmo filtro não retornou nenhuma faixa, o que sugere forte centralização no topo dessas capitais.
+- Na primeira rodada, o sertanejo universitário dominou os resultados por seguir um modelo de distribuição em larga escala. Por isso restringi o escopo a Recife e BH.
+
+**Limitações:** o ranking mostra posição, não volume de streams; o corte de #85 é uma escolha minha e pode alterar os resultados; e a influência de playlists editoriais é uma hipótese, não algo medido nos dados.
 
 ---
 
 ## Fonte dos dados
 
-Rankings semanais do Spotify por capital brasileira (2021–2024), obtidos no Kaggle: [link do dataset](COLOQUE_O_LINK_AQUI).
+[Brazil Regional Spotify Charts (Kaggle, filipeasm)](https://www.kaggle.com/datasets/filipeasm/brazil-regional-spotify-charts): rankings semanais por capital, 2021–2024, com mais de 201 mil registros.
 
 ## Próximos passos
 
-- [ ] Testar a sensibilidade dos resultados variando o corte de posição (ex.: 50, 85, 100)
-- [ ] Incluir mais capitais do Nordeste e do Norte
-- [ ] Adicionar testes automatizados para a API
-- [ ] Containerizar com Docker e publicar a API online
+- [ ] Testes automatizados dos endpoints (pytest + TestClient)
+- [ ] Migrar de SQLite para PostgreSQL
+- [ ] Dockerizar e publicar a API online
+- [ ] Testar a sensibilidade da análise variando o corte de posição
 
-## Autor
+## Contato
 
-**Beca Guimas** · [LinkedIn](https://www.linkedin.com/in/becaguimas/)
+**Beca Guimas** · [LinkedIn](COLOQUE_O_LINK_DO_SEU_LINKEDIN)
