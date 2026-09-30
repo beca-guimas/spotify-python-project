@@ -1,6 +1,6 @@
 # 🎧 Garimpo Indie API
 
-**API REST com banco relacional sobre 201 mil rankings semanais do Spotify Brasil (2021–2024).**
+**API REST com banco relacional sobre 201 mil rankings semanais do Spotify Brasil (2021–2023).**
 Construída com Python, SQLAlchemy e FastAPI, e usada para investigar se mercados musicais regionais (Recife, BH) funcionam de forma independente do eixo RJ-SP.
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
