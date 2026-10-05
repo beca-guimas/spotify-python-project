@@ -1,7 +1,7 @@
 # 🎧 Garimpo Indie API
 
 **API REST com banco relacional sobre 201 mil rankings semanais do Spotify Brasil (2021–2023).**
-Construída com Python, SQLAlchemy e FastAPI, e usada para investigar se mercados musicais regionais (Recife, BH) funcionam de forma independente do eixo RJ-SP.
+Construída com Python, SQLAlchemy e FastAPI. 
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-API-009688)
@@ -13,6 +13,12 @@ Construída com Python, SQLAlchemy e FastAPI, e usada para investigar se mercado
 ---
 
 ## Visão geral
+
+Comecei este projeto com uma pergunta simples: será que dá pra encontrar bandas de rock indie nos rankings regionais do Spotify Brasil?
+
+Os dados mostraram outra coisa. Nas capitais, o topo era dominado por outros estilos, principalmente o sertanejo universitário. Em vez de forçar o resultado que eu esperava, segui o que apareceu e a pergunta mudou: quais músicas se sustentam no topo de uma cidade, e até que ponto o eixo Rio-São Paulo define o que faz sucesso no resto do país?
+
+Para investigar isso, processei mais de 201 mil linhas de rankings semanais (2021 a 2023), organizei tudo num banco de dados relacional e montei uma API para consultar os dados.
 
 O projeto tem duas partes que se alimentam:
 
@@ -93,9 +99,28 @@ uvicorn api:app --reload         # sobe a API
 
 ---
 
+## Como funciona
+
+O projeto tem três partes, nesta ordem:
+
+Um notebook (1_analise_e_consolidacao.ipynb) lê centenas de arquivos CSV semanais, corrige problemas de texto (como "Belém", que chegava como "Belm") e junta tudo numa tabela só, usando Pandas.
+Os scripts modelos.py e popular_banco.py criam o banco de dados com SQLAlchemy e gravam os dados nele.
+A API (api.py, feita com FastAPI) permite consultar o banco por HTTP.
+
+O banco tem três tabelas ligadas por chaves estrangeiras:
+
+musicas: uri (chave primária), track_name, artist_names
+cidades: id_cidade (chave primária), nome_cidade
+historico_rankings: id_ranking, rank, semana, peak, streak, fk_musica e fk_cidade
+
+Rotas principais da API: GET /cidades e GET /garimpo/resiliencia/{id_cidade}. A lista completa aparece na documentação interativa em /docs.
+
+---
+
 ## O que a análise mostrou
 
 A análise foi feita com Pandas no Jupyter Notebook e reproduzida nas consultas ao banco. O critério foi: Top 10 na capital regional e posição acima de #85 (ou ausência) no RJ-SP.
+Para comparar, usei as posições no ranking do RJ-SP. O valor 101 significa que a música ficou fora do Top 100 de lá.
 
 **Recife tem hits que o Sudeste não enxerga:**
 
@@ -105,6 +130,9 @@ A análise foi feita com Pandas no Jupyter Notebook e reproduzida nas consultas 
 | A Gente Se Entrega | NATTAN | #7 | fora do Top 100 |
 | Cadê Seu Namorado Moça? | Thales Lessa | #9 | fora do Top 100 |
 | Duas | Nadson O Ferinha | #10 | fora do Top 100 |
+
+Ainda não respondi à pergunta original. Eu não filtrei os dados por gênero, então não sei dizer se existe rock indie nesses rankings. É o próximo passo.
+
 
 **Outros achados:**
 - "Poesia Acústica #6" ficou **118 semanas consecutivas** nos rankings regionais sem chegar ao #1 da cidade.
