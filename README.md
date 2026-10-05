@@ -1,12 +1,10 @@
 # 🎧 Garimpo Indie API
 
 **API REST com banco relacional sobre 201 mil rankings semanais do Spotify Brasil (2021–2023).**
-Construída com Python, SQLAlchemy e FastAPI. 
 
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-API-009688)
-![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-red)
-![Pandas](https://img.shields.io/badge/Pandas-ETL-150458)
+## Stack
+
+Python · FastAPI · Uvicorn · SQLAlchemy (ORM) · Pandas · Jupyter · PyCharm
 
 <!-- Coloque aqui um print do Swagger (http://localhost:8000/docs) -->
 
@@ -38,9 +36,6 @@ modelos.py + popular_banco.py    →  schema SQLAlchemy + carga no banco
 api.py (FastAPI + Uvicorn)       →  API REST com docs automática (Swagger)
 ```
 
-## Stack
-
-Python · FastAPI · Uvicorn · SQLAlchemy (ORM) · Pandas · Jupyter · PyCharm
 
 ---
 
