@@ -17,7 +17,7 @@ Construída com Python, SQLAlchemy e FastAPI, e usada para investigar se mercado
 O projeto tem duas partes que se alimentam:
 
 - **Backend:** pipeline de ETL, modelagem relacional e API REST para consultar os rankings.
-- **Análise dos dados:** perguntas de pesquisa respondidas em cima desse banco, e algumas delas viraram endpoints.
+- **Análise:** perguntas de pesquisa respondidas em cima desse banco, e algumas delas viraram endpoints.
 
 ```
 CSVs semanais (Kaggle)
@@ -57,22 +57,18 @@ Normalizei os dados em 3 tabelas, com chaves primárias e estrangeiras:
 
 Com o servidor rodando, a documentação interativa fica em **http://localhost:8000/docs**.
 
-
-
 | Método | Rota | O que retorna |
 |---|---|---|
-| GET | `/cidades` | Capitais disponíveis |
-| GET | `/musicas?busca=&limit=&offset=` | Busca paginada por título ou artista |
-| GET | `/musicas/{uri}` | Dados de uma faixa |
-| GET | `/musicas/{uri}/historico?cidade=` | Trajetória semanal da faixa |
-| GET | `/rankings?cidade=&semana=&top=` | Ranking de uma cidade em uma semana |
-| GET | `/analises/resiliencia?cidade=` | Faixas com maior sequência de semanas no ranking |
-| GET | `/analises/exclusivas-regionais?cidade=&top=&corte=` | Faixas Top N na cidade e ausentes do RJ-SP |
+| GET | `/cidades` | Capitais disponíveis e seus ids |
+| GET | `/musicas?busca=&limite=` | Busca músicas por trecho do título ou do artista |
+| GET | `/historico?uri=&id_cidade=` | Trajetória semanal de uma música |
+| GET | `/garimpo/resiliencia/{id_cidade}` | Músicas com maior sequência de semanas no ranking da cidade, sem nunca chegar ao #1 nela |
+| GET | `/garimpo/exclusivas/{id_cidade}?top=&corte=` | Músicas que chegaram ao Top N da cidade e ficaram fora do RJ-SP |
 
 Exemplo:
 
 ```bash
-curl "http://localhost:8000/analises/exclusivas-regionais?cidade=Recife&top=10&corte=85"
+curl "http://localhost:8000/garimpo/exclusivas/1?top=10&corte=85"
 ```
 
 ---
@@ -99,7 +95,7 @@ uvicorn api:app --reload         # sobe a API
 
 ## O que a análise mostrou
 
-A análise foi feita com Pandas no notebook e reproduzida nas consultas ao banco. O critério foi: Top 10 na capital regional e posição acima de #85 (ou ausência) no RJ-SP.
+A análise foi feita com Pandas no Jupyter Notebook e reproduzida nas consultas ao banco. O critério foi: Top 10 na capital regional e posição acima de #85 (ou ausência) no RJ-SP.
 
 **Recife tem hits que o Sudeste não enxerga:**
 
@@ -111,7 +107,7 @@ A análise foi feita com Pandas no notebook e reproduzida nas consultas ao banco
 | Duas | Nadson O Ferinha | #10 | fora do Top 100 |
 
 **Outros achados:**
-- "Poesia Acústica #6" ficou **118 semanas consecutivas** nos rankings regionais sem chegar ao #1 nacional.
+- "Poesia Acústica #6" ficou **118 semanas consecutivas** nos rankings regionais sem chegar ao #1 da cidade.
 - Em Manaus e Belo Horizonte, o mesmo filtro não retornou nenhuma faixa, o que sugere forte centralização no topo dessas capitais.
 - Na primeira rodada, o sertanejo universitário dominou os resultados por seguir um modelo de distribuição em larga escala. Por isso restringi o escopo a Recife e BH.
 
@@ -121,7 +117,7 @@ A análise foi feita com Pandas no notebook e reproduzida nas consultas ao banco
 
 ## Fonte dos dados
 
-[Brazil Regional Spotify Charts (Kaggle, filipeasm)](https://www.kaggle.com/datasets/filipeasm/brazil-regional-spotify-charts): rankings semanais por capital, 2021–2024, com mais de 201 mil registros.
+[Brazil Regional Spotify Charts (Kaggle, filipeasm)](https://www.kaggle.com/datasets/filipeasm/brazil-regional-spotify-charts): rankings semanais por capital, 2021–2023, com mais de 201 mil registros.
 
 ## Próximos passos
 
@@ -130,6 +126,6 @@ A análise foi feita com Pandas no notebook e reproduzida nas consultas ao banco
 - [ ] Dockerizar e publicar a API online
 - [ ] Testar a sensibilidade da análise variando o corte de posição
 
-# Autor
+## Autor
 
 **Beca Guimas** · [LinkedIn](https://www.linkedin.com/in/becaguimas/)
