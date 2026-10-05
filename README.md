@@ -6,8 +6,6 @@
 
 Python · FastAPI · Uvicorn · SQLAlchemy (ORM) · Pandas · Jupyter · PyCharm
 
-<!-- Coloque aqui um print do Swagger (http://localhost:8000/docs) -->
-
 ---
 
 ## Visão geral
@@ -74,26 +72,6 @@ curl "http://localhost:8000/garimpo/exclusivas/1?top=10&corte=85"
 
 ---
 
-## Como rodar
-
-**Pré-requisito:** Python 3.10+
-
-```bash
-git clone https://github.com/beca-guimas/spotify-python-project.git
-cd spotify-python-project
-
-python -m venv .venv
-source .venv/bin/activate        # Windows: .\.venv\Scripts\activate
-
-pip install pandas notebook openpyxl sqlalchemy fastapi uvicorn
-
-python modelos.py                # cria as tabelas
-python popular_banco.py          # carrega os dados
-uvicorn api:app --reload         # sobe a API
-```
-
----
-
 ## Como funciona
 
 O projeto tem três partes, nesta ordem:
@@ -109,6 +87,23 @@ cidades: id_cidade (chave primária), nome_cidade
 historico_rankings: id_ranking, rank, semana, peak, streak, fk_musica e fk_cidade
 
 Rotas principais da API: GET /cidades e GET /garimpo/resiliencia/{id_cidade}. A lista completa aparece na documentação interativa em /docs.
+
+## Como rodar
+
+Primeiro, baixe o dataset do Kaggle (link abaixo) e deixe a pasta regional na raiz do projeto. Ela deve ter uma subpasta por capital, e cada subpasta um arquivo CSV por semana.
+
+Se precisar rodar popular_banco.py de novo, apague antes o arquivo garimpo_indie.db. Sem isso, o script dá erro, porque as cidades já estão cadastradas.
+
+python -m venv .venv
+.\.venv\Scripts\activate
+python -m pip install pandas notebook openpyxl sqlalchemy fastapi uvicorn
+
+python modelos.py
+python popular_banco.py
+uvicorn api:app --reload
+
+Depois abra http://localhost:8000/docs para testar as rotas.
+
 
 ---
 
